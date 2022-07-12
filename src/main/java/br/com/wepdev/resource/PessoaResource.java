@@ -24,18 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.wepdev.event.RecursoCriadoEvent;
 import br.com.wepdev.model.Pessoa;
 import br.com.wepdev.repository.PessoaRepository;
+import br.com.wepdev.service.PessoaService;
 
 @RestController
 @RequestMapping("/pessoas")
 public class PessoaResource {
 
+	
 	@Autowired
 	private PessoaRepository pessoaRepository;
 
 	// Responsavel por disparar os eventos
 	@Autowired
 	private ApplicationEventPublisher publisher;
+	
+	@Autowired
+	private PessoaService pessoaService;
 
+	
+	
 	@PostMapping
 	public ResponseEntity<Pessoa> criar(@Valid @RequestBody Pessoa pessoa, HttpServletResponse response) {
 		Pessoa pessoaSalva = pessoaRepository.save(pessoa);
@@ -69,5 +76,34 @@ public class PessoaResource {
 
 		return this.pessoaRepository.save(pessoaSalva);
 	}
+	
+	
+	@PutMapping("/{codigo}/ativo")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void atualizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody Boolean ativo) {
+		
+		pessoaService.atualizarPropriedadeAtivo(codigo, ativo);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
