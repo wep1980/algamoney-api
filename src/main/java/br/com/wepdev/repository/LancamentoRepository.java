@@ -6,4 +6,5 @@ import br.com.wepdev.model.Lancamento;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long>{
 
+
 }
