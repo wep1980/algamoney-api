@@ -25,6 +25,7 @@ import br.com.wepdev.event.RecursoCriadoEvent;
 import br.com.wepdev.exceptionhandler.AlgamoneyExceptionHandler.Erro;
 import br.com.wepdev.model.Lancamento;
 import br.com.wepdev.repository.LancamentoRepository;
+import br.com.wepdev.repository.filter.LancamentoFilter;
 import br.com.wepdev.service.LancamentoService;
 import br.com.wepdev.service.exception.PessoaInexistenteOuInativaException;
 
@@ -49,8 +50,8 @@ public class LancamentoResource {
 	
 	
 	@GetMapping
-	public List<Lancamento> listar() {
-		return lancamentoRepository.findAll();
+	public List<Lancamento> pesquisar(LancamentoFilter lancamentofilter) {
+		return lancamentoRepository.filtrar(lancamentofilter);
 	}
 	
 	

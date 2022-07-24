@@ -73,13 +73,20 @@
 			<optional>true</optional>
 		</dependency>
 
-        <!-- dependencia para pegar a causa raiz das exceptions -->
+		<!-- dependencia para pegar a causa raiz das exceptions -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.12.0</version>
 		</dependency>
-		
+        
+        <!-- Dependencia adicionada para utilizar o metamodel - AULA 5.7 algaworks Angular com Spring -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
