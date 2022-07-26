@@ -92,9 +92,5 @@ public class LancamentoResource {
 	public void remover(@PathVariable Long codigo) {
 	    lancamentoRepository.deleteById(codigo);
 	}
-	
-	
-	
-	
-	
+
 }
