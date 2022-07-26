@@ -13,7 +13,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication() // Autenticação basica feita em memoria
-        .withUser("admin").password("{noop}admin").roles("ROLE"); // autenticação e autorização, por enquanto semente a autorização sera implementada
+        .withUser("admin").password("{noop}admin").roles("ROLE"); // autenticação e autorização, por enquanto semente a autorização sera implementada. Declarando o encoder direto na senha password("{noop}admin")
 		
 	}
 	
