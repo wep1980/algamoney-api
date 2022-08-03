@@ -100,8 +100,8 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		return erros;
 	}
-	
 
+	
 	@Getter
 	public static class Erro {
 

@@ -88,11 +88,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-
 		<!-- Segurança basic -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -105,6 +100,7 @@
 			<version>2.5.1.RELEASE</version>
 		</dependency>
 
+        <!-- Dependencias para trabalhar com oauth2 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>

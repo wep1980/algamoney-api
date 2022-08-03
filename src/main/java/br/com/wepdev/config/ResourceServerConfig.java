@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
-public class ResourceServerConfig extends WebSecurityConfigurerAdapter{
+public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
      
 	
     @Override
@@ -29,10 +29,10 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter{
     public void configure(HttpSecurity http) throws Exception {
         
         http.authorizeRequests()
-                .antMatchers("/categorias").permitAll()
+                .antMatchers("/categorias").permitAll() // Categorias esta liberado para ser acessado sem token
                 .anyRequest().authenticated()
             .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // não mantem estados no servidor relacionado a segurança (sem sessão)
             .and()
                 .csrf().disable()
                 .oauth2ResourceServer().opaqueToken();

@@ -42,4 +42,5 @@ public class Pessoa {
 		
 		return !this.ativo;
 	}
+    
 }

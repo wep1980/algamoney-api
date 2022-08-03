@@ -25,15 +25,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-    	
+    /*
+     * Metodo que autoriza o cliente a acessar a api, no caso cliente sera o Angular.
+     * Pode ser liberado para varios clientes	
+     */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()
 				.withClient("angular")
-				.secret(passwordEncoder.encode("@ngul@r0")) // @ngul@r0
-				.scopes("read", "write")
-				.authorizedGrantTypes("password")
-				.accessTokenValiditySeconds(1800)
+				.secret(passwordEncoder.encode("@ngul@r0")) // @ngul@r0 senha para acessar
+				.scopes("read", "write") // O que e permitido para o cliente angular, ler e escrever
+				.authorizedGrantTypes("password") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
+				.accessTokenValiditySeconds(1800) // Tempo que o token é valido, 30 min
 			.and()
 				.withClient("mobile")
 				.secret(passwordEncoder.encode("m0b1l30")) // m0b1l30
@@ -42,10 +45,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.accessTokenValiditySeconds(1800);
 	}
 
+	/*
+	 * Metodo onde define onde o token e armazenado, o Angular acessa esse token
+	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints
-			.authenticationManager(authenticationManager)
+			.authenticationManager(authenticationManager) // verifica usuario e senha
 			.tokenStore(tokenStore());
 	}
 
@@ -54,6 +60,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		security.checkTokenAccess("permitAll()");
 	}
 
+	/*
+	 * Token armazenado em memoria
+	 */
 	@Bean
 	public TokenStore tokenStore() {
 		return new InMemoryTokenStore();
