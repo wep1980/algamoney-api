@@ -42,13 +42,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.authorizedGrantTypes("password", "refresh_token") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
 				.accessTokenValiditySeconds(10) // Tempo do token esta valido por 10 segundos, 30 min seria (1800)
 				.refreshTokenValiditySeconds(3600 * 24); // tempo de vida do refresh token, 1 dia
-			//.and()
-				//.withClient("mobile") // Configuracao para um segundo client
-				//.secret(passwordEncoder.encode("m0b1l30")) // m0b1l30
-				//.scopes("read")
-				//.authorizedGrantTypes("password")
-				//.accessTokenValiditySeconds(1800); // Validade do token de 30 min (1800)
 	}
+	
 
 	/*
 	 * Metodo onde define onde o token e armazenado, o Angular acessa esse token
