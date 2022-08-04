@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -25,6 +26,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private UserDetailsService userDetailsService;
+	
     /*
      * Metodo que autoriza o cliente a acessar a api, no caso cliente sera o Angular.
      * Pode ser liberado para varios clientes	
@@ -35,14 +39,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.withClient("angular")
 				.secret(passwordEncoder.encode("@ngul@r0")) // @ngul@r0 senha para acessar
 				.scopes("read", "write") // O que e permitido para o cliente angular, ler e escrever
-				.authorizedGrantTypes("password") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
-				.accessTokenValiditySeconds(1800) // Tempo que o token é valido, 30 min
-			.and()
-				.withClient("mobile")
-				.secret(passwordEncoder.encode("m0b1l30")) // m0b1l30
-				.scopes("read")
-				.authorizedGrantTypes("password")
-				.accessTokenValiditySeconds(1800);
+				.authorizedGrantTypes("password", "refresh_token") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
+				.accessTokenValiditySeconds(10) // Tempo do token esta valido por 10 segundos, 30 min seria (1800)
+				.refreshTokenValiditySeconds(3600 * 24); // tempo de vida do refresh token, 1 dia
+			//.and()
+				//.withClient("mobile") // Configuracao para um segundo client
+				//.secret(passwordEncoder.encode("m0b1l30")) // m0b1l30
+				//.scopes("read")
+				//.authorizedGrantTypes("password")
+				//.accessTokenValiditySeconds(1800); // Validade do token de 30 min (1800)
 	}
 
 	/*
@@ -53,7 +58,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		endpoints
 			.authenticationManager(authenticationManager) // verifica usuario e senha
 			.accessTokenConverter(accessTokenConverter())
-			.tokenStore(tokenStore());
+			.tokenStore(tokenStore())
+			.userDetailsService(userDetailsService) // configura a parte de refresh do token
+			.reuseRefreshTokens(false); // sempre que for feito o pedido do um novo access token , um novo refresh token sera enviado
 	}
 	
 	/*

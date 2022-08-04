@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -58,7 +59,31 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 
         return NimbusJwtDecoder.withSecretKey(secretKey).build();
     }
+    
+    @Bean
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {        
+        return super.authenticationManager();
+    }
 
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+    
+    
+    /**
+     * renovação do AccessToken, através do RefreshToken, 
+     * é preciso ler os dados do usuário referenciado dentro do RefreshToken, para verificar se,
+     * por exemplo, ele está bloqueado.
+     */
+    @Bean
+    @Override
+    public UserDetailsService userDetailsServiceBean() throws Exception {
+       return super.userDetailsServiceBean();
+    }  
+    
     
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
@@ -82,17 +107,5 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
         return jwtAuthenticationConverter;
     }
 
-    
-    @Bean
-    @Override
-    protected AuthenticationManager authenticationManager() throws Exception {        
-        return super.authenticationManager();
-    }
-    
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
     
 }
