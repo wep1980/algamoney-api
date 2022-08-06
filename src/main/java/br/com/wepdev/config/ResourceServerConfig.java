@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,27 +19,22 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
-@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
 public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
      
 	
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("admin@algamoney.com")
-                .password("admin")
-                .roles("ROLE");
-    }
-
+	@Autowired
+	private UserDetailsService userDetailsService;	
+	
+	
     @Override
     public void configure(HttpSecurity http) throws Exception {
         
@@ -52,12 +48,12 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
                 .oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
     }
     
-    
+	
     @Bean
     public JwtDecoder jwtDecoder() {
-        var secretKey = new SecretKeySpec("3032885ba9cd6621bcc4e7d6b6c35c2b".getBytes(), "HmacSHA256");
-
-        return NimbusJwtDecoder.withSecretKey(secretKey).build();
+    	var secretKey = new SecretKeySpec("3032885ba9cd6621bcc4e7d6b6c35c2b".getBytes(), "HmacSHA256");
+    	
+    	return NimbusJwtDecoder.withSecretKey(secretKey).build();
     }
     
     @Bean
@@ -65,47 +61,41 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     protected AuthenticationManager authenticationManager() throws Exception {        
         return super.authenticationManager();
     }
-
+    
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    	 return new BCryptPasswordEncoder();
     }
     
     
-    /**
-     * renovação do AccessToken, através do RefreshToken, 
-     * é preciso ler os dados do usuário referenciado dentro do RefreshToken, para verificar se,
-     * por exemplo, ele está bloqueado.
-     */
-    @Bean
     @Override
-    public UserDetailsService userDetailsServiceBean() throws Exception {
-       return super.userDetailsServiceBean();
-    }  
-    
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
+
     
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            List<String> authorities = jwt.getClaimAsStringList("authorities");
-
-            if (authorities == null) {
-                authorities = Collections.emptyList();
-            }
-
-            JwtGrantedAuthoritiesConverter scopesAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-            Collection<GrantedAuthority> grantedAuthorities = scopesAuthoritiesConverter.convert(jwt);
-
-            grantedAuthorities.addAll(authorities.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList()));
-
-            return grantedAuthorities;
-        });
-
-        return jwtAuthenticationConverter;
-    }
+		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
+			List<String> authorities = jwt.getClaimAsStringList("authorities");
+	
+			if (authorities == null) {
+				authorities = Collections.emptyList();
+			}
+	
+			JwtGrantedAuthoritiesConverter scopesAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+			Collection<GrantedAuthority> grantedAuthorities = scopesAuthoritiesConverter.convert(jwt);
+	
+			grantedAuthorities.addAll(authorities.stream()
+					.map(SimpleGrantedAuthority::new)
+					.collect(Collectors.toList()));
+	
+			return grantedAuthorities;
+		});
+	
+		return jwtAuthenticationConverter;
+	}
 
     
 }
