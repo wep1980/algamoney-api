@@ -5,6 +5,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -17,6 +18,8 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import br.com.wepdev.config.property.AlgamoneyApiProperty;
+
 /**
  * Classe que trabalha o refresh token para que ele fique armazenado em um cookie http ( BOAS PRATICAS )
  * essa classe intercepta a requisão antes da resposta para quem fez a chamada
@@ -28,6 +31,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @ControllerAdvice
 public class RefreshTokenPostProcessor implements ResponseBodyAdvice<OAuth2AccessToken>{
 
+	
+	@Autowired
+	private AlgamoneyApiProperty algamoneyApiProperty;
 	
 	
 	@Override
@@ -63,7 +69,7 @@ public class RefreshTokenPostProcessor implements ResponseBodyAdvice<OAuth2Acces
 		
 		Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken); // Criando um cookie
 		refreshTokenCookie.setHttpOnly(true); // acesso somente via HTTP
-		refreshTokenCookie.setSecure(false); // Token que de deve funcionar apenas em HTTPS, em produção deve ser usado em TRUE 
+		refreshTokenCookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps()); // Token que de deve funcionar apenas em HTTPS, em produção deve ser usado em TRUE 
 		refreshTokenCookie.setPath(req.getContextPath() + "/oauth/token"); // Para qual canminho esse cookie deve ser enviado para o browse
 		refreshTokenCookie.setMaxAge(2592000); // em quanto tempo esse cookie vai expirar (2592000) dias
 		resp.addCookie(refreshTokenCookie); // Adicionando o cookie na resposta

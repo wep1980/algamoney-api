@@ -10,9 +10,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import br.com.wepdev.config.property.AlgamoneyApiProperty;
 
 /**
  * Filtro criado para a liberação dos CORS
@@ -23,8 +26,8 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter{
 
-	
-	private String originPermitida = "http://localhost:8000";
+	@Autowired
+	private AlgamoneyApiProperty algamoneyApiProperty;
 	
 	
 	@Override
@@ -35,10 +38,10 @@ public class CorsFilter implements Filter{
 		HttpServletResponse response = (HttpServletResponse) resp;
 		
 		// Essas 2 configuração estão de fora pq precisam ser sempre enviadas nas requisições
-		response.setHeader("Access-Control-Allow-Origin", originPermitida);
+		response.setHeader("Access-Control-Allow-Origin", algamoneyApiProperty.getOriginPermitida());
         response.setHeader("Access-Control-Allow-Credentials", "true"); // Configuração para o cookie que contem o refreshToken ser permitido
 		
-        if ("OPTIONS".equals(request.getMethod()) && originPermitida.equals(request.getHeader("Origin"))) {
+        if ("OPTIONS".equals(request.getMethod()) && algamoneyApiProperty.getOriginPermitida().equals(request.getHeader("Origin"))) {
 			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
         	response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
         	response.setHeader("Access-Control-Max-Age", "3600"); // So depois de 1 hora que o browse vai fazer a proxima requisição
