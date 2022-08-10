@@ -1,5 +1,7 @@
 package br.com.wepdev.config;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,9 +12,13 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
+import br.com.wepdev.config.token.CustomTokenEnhancer;
 
 @SuppressWarnings("deprecation")
 @Configuration
@@ -41,7 +47,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.scopes("read", "write") // O que e permitido para o cliente angular, ler e escrever
 				.authorizedGrantTypes("password", "refresh_token") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
 				.accessTokenValiditySeconds(1800) // Tempo do token esta valido por 10 segundos, 30 min seria (1800)
-				.refreshTokenValiditySeconds(3600 * 24); // tempo de vida do refresh token, 1 dia
+				.refreshTokenValiditySeconds(3600 * 24) // tempo de vida do refresh token, 1 dia
+				.and()
+				.withClient("mobile")
+				.secret(passwordEncoder.encode("m0b1le")) // Forma insegura
+				.scopes("read")
+				.authorizedGrantTypes("password", "refresh_token")
+				.accessTokenValiditySeconds(1800)
+				.refreshTokenValiditySeconds(3600 * 24);
 	}
 	
 
@@ -50,11 +63,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		
+		TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+		tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
+		
 		endpoints
 			.authenticationManager(authenticationManager) // verifica usuario e senha
+			.userDetailsService(userDetailsService) // configura a parte de refresh do token
+			.tokenEnhancer(tokenEnhancerChain) // esse tpken contentando as informações do usuario que esta logado tb e passado
 			.accessTokenConverter(accessTokenConverter())
 			.tokenStore(tokenStore())
-			.userDetailsService(userDetailsService) // configura a parte de refresh do token
 			.reuseRefreshTokens(false); // sempre que for feito o pedido do um novo access token , um novo refresh token sera enviado
 	}
 	
@@ -76,5 +94,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		return new JwtTokenStore(accessTokenConverter());
 	}
 
+	
+	@Bean
+	public TokenEnhancer tokenEnhancer() {
+		return new CustomTokenEnhancer();
+	}
 
 }
