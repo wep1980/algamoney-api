@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import br.com.wepdev.config.token.CustomTokenEnhancer;
 
+@Profile("oauth-security")
 @SuppressWarnings("deprecation")
 @Configuration
 @EnableAuthorizationServer
@@ -43,7 +45,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()
 				.withClient("angular")
-				.secret(passwordEncoder.encode("@ngul@r0")) // @ngul@r0 senha para acessar
+				.secret("$2a$10$UAc049fUm6Bxy8X/.mpn8.PfD2ncb4ZgvmEa5Hb.JOGVJNX1ampgG") // @ngul@r0 senha para acessar
 				.scopes("read", "write") // O que e permitido para o cliente angular, ler e escrever
 				.authorizedGrantTypes("password", "refresh_token") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
 				.accessTokenValiditySeconds(1800) // Tempo do token esta valido por 10 segundos, 30 min seria (1800)
