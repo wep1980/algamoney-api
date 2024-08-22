@@ -11,7 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import br.com.wepdev.event.RecursoCriadoEvent;
 
 /*
- * Classe que fica ouvindo os Eventos
+ * Classe que fica ouvindo os Eventos, no caso ouve a classe RecursoCriadoEvent e executa o codigo abaixo
  */
 @Component
 public class RecursoCriadoListener implements ApplicationListener<RecursoCriadoEvent>{

@@ -25,12 +25,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import lombok.Getter;
 
-// Classe que captura excessoes de respostas de entidades
-@ControllerAdvice // Observa toda a aplicação
+// Classe que captura excessoes de respostas de entidades de toda API
+@ControllerAdvice // Observa toda a aplicação, sem essa anotação nao e possivel capturar as excessoes
 public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Autowired
-	private MessageSource messageSource; // Pegando a mensagem do arquivo messages.properties, objeto do spring
+	private MessageSource messageSource; // Pegando as mensagens do arquivo messages.properties, objeto do spring
 
 	
 	/**
@@ -40,28 +40,38 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
+		// Pegando a mensagem do messages.properties e passando essa mensagem de erro para o usuario
 		String mensagemUsuario = this.messageSource.getMessage("mensagem.invalida", null,
 				LocaleContextHolder.getLocale());
+
+		// Passando msg para o desenvolvedor. se nao existir a causa do erro, e mostrado direto o toString()
 		String mensagemDesenvolvedor = Optional.ofNullable(ex.getCause()).orElse(ex).toString(); // Linha modificada
 
 		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 	}
-	
 
+
+	/**
+	 * Metodo que trata os argumentos de um metodo invalido, pega os erros do @Valid passado nos,
+	 * Controllers ou Resources
+	 */
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
+		// Retorna uma lista de erros, todos os campos que contem erro. Exp : nome, descricao, etc.....
+		// getBindingResult() -> dentro dele contem todos os erros
 		List<Erro> erros = criarListaDeErros(ex.getBindingResult());
+
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 	}
 	
 
 	// Metodo customizado de tratamento da exception EmptyResultDataAccessException
 	// @ResponseStatus(HttpStatus.NOT_FOUND) se não quiser enviar o corpo e so habilitar esse ResponseStatus
-	@ExceptionHandler({ EmptyResultDataAccessException.class })
+	@ExceptionHandler({ EmptyResultDataAccessException.class }) // Escificando a exception a ser tratada
 	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex,
 			WebRequest request) {
 
@@ -88,20 +98,34 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 
 	}
-	
 
+
+	/**
+	 * Metodo responsavel por criar a lista de erros, os campos que contem erros ao serem passados na
+	 * representacão(postman e etc...).
+	 * BindingResult bindingResult -> dentro dele contem todos os erros
+	 * @param bindingResult
+	 * @return
+	 */
 	private List<Erro> criarListaDeErros(BindingResult bindingResult) {
 		List<Erro> erros = new ArrayList<>();
 
+		  // Pegando todos os campos das entidades que contem erros
 		for (FieldError fieldError : bindingResult.getFieldErrors()) {
+
+			// Passagem da msg de erro para o usuario que contem o nome do campo que esta errado
 			String mensagemUsuario = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+
 			String mensagemDesenvolvedor = fieldError.toString();
+
 			erros.add(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		}
 		return erros;
 	}
 
-	
+	/**
+	 * Classe criada para passar mensagens de erro.
+	 */
 	@Getter
 	public static class Erro {
 

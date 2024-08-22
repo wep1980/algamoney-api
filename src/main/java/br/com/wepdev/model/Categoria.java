@@ -18,7 +18,7 @@ public class Categoria {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
 	
-	@NotNull
+	@NotNull // Esse campo nao pode ser nulo
 	private String nome;
 
 }

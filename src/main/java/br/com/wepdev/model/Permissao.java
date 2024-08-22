@@ -17,7 +17,7 @@ import lombok.Setter;
 public class Permissao {
 	
 	
-	@EqualsAndHashCode.Include
+	//@EqualsAndHashCode.Include
 	@Id
 	private Long codigo;
 	

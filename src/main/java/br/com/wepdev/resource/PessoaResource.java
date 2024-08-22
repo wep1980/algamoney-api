@@ -36,7 +36,7 @@ public class PessoaResource {
 	@Autowired
 	private PessoaRepository pessoaRepository;
 
-	// Responsavel por disparar os eventos
+	// Responsavel por disparar os eventos criados por mim
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	
@@ -50,7 +50,10 @@ public class PessoaResource {
 	public ResponseEntity<Pessoa> criar(@Valid @RequestBody Pessoa pessoa, HttpServletResponse response) {
 		Pessoa pessoaSalva = pessoaRepository.save(pessoa);
 
-		// Quem gerou esse evento, esse objeto aqui, por isso o this
+		/*
+		Quem gerou esse evento, esse objeto aqui, por isso o this.
+		Evento e listner criado por mim
+		 */
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, pessoaSalva.getCodigo()));
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(pessoaSalva);
@@ -60,6 +63,7 @@ public class PessoaResource {
 	@GetMapping("/{codigo}")
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_PESSOA') and hasAuthority('SCOPE_read')")
 	public ResponseEntity<Pessoa> buscarPeloCodigo(@PathVariable Long codigo) {
+
 		Optional<Pessoa> pessoa = pessoaRepository.findById(codigo);
 		return pessoa.isPresent() ? ResponseEntity.ok(pessoa.get()) : ResponseEntity.notFound().build();
 	}
@@ -69,6 +73,7 @@ public class PessoaResource {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PreAuthorize("hasAuthority('ROLE_REMOVER_PESSOA') and hasAuthority('SCOPE_write')")
 	public void remover(@PathVariable Long codigo) {
+
 		this.pessoaRepository.deleteById(codigo);
 	}
 
@@ -77,6 +82,7 @@ public class PessoaResource {
 	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_PESSOA') and hasAuthority('SCOPE_write')")
 	public ResponseEntity<Pessoa> atualizar(@PathVariable Long codigo, @Valid @RequestBody Pessoa pessoa) {
 
+		// No service e feita a logica de pegas os dados passados e substituir pelo os dados que ja existiam
 		Pessoa pessoaSalva = pessoaService.atualizar(codigo, pessoa);
 
 		return ResponseEntity.ok(pessoaSalva);
@@ -86,8 +92,9 @@ public class PessoaResource {
 	@PutMapping("/{codigo}/ativo")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_PESSOA') and hasAuthority('SCOPE_write')")
-	public void atualizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody Boolean ativo) {
-		
+	public void atualizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody(required = true) Boolean ativo) {
+
+		// Atualiza parcialmente apenas o campo ativo do objeto
 		pessoaService.atualizarPropriedadeAtivo(codigo, ativo);
 	}
 

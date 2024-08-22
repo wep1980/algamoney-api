@@ -26,7 +26,7 @@ public class Pessoa {
     @NotNull
     private String nome;
 
-    @Embedded
+    @Embedded // nao e uma tabela na base, e so para ajudar a organizar a classe pessoa
     private Endereco endereco;
 
     @NotNull

@@ -7,7 +7,8 @@ import org.springframework.context.ApplicationEvent;
 import lombok.Getter;
 
 /**
- * Classe de Evento criada para disparar o header Location e tirar o codigo repetitivo dos Resources
+ * Classe de Evento criada para disparar o header Location e tirar o codigo repetitivo dos Resources e adcionar
+ * o Header location
  */
 @Getter
 public class RecursoCriadoEvent extends ApplicationEvent{

@@ -37,7 +37,11 @@ public class PessoaService {
 	
 	
 	public Pessoa buscarPessoaPeloCodigo(Long codigo) {
-		
+
+		/*
+		Metodo que busca uma pessoa pelo codigo, caso não seja encontrada retorna uma EmptyResultDataAccessException(1),
+		1 -> pq era esperando que 1 obj fosse retornado
+		 */
 		Pessoa pessoaSalva = pessoaRepository.findById(codigo)
 				.orElseThrow(() -> new EmptyResultDataAccessException(1));
 
