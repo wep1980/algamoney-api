@@ -7,6 +7,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Classe que contem os campos que podem filtrar um lancamento
+ */
 @Getter
 @Setter
 public class LancamentoFilter {

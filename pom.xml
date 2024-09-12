@@ -88,12 +88,13 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Segurança basic -->
+		<!--Para usar a Segurança basic so essa dependencia e necessaria -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
+        <!-- Dependencia necessaria para trabalhar com o OAuth 2-->
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>

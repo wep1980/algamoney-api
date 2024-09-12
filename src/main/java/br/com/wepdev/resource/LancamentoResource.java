@@ -54,16 +54,30 @@ public class LancamentoResource {
 	
 	@Autowired
 	private MessageSource messageSource;
-	
-	
+
+
+	/**
+	 * Metodo que pesquisa lancamento por filtro, que pode ser descricao, dataVencimentoDe, dataVencimentoAte.
+	 * Metodo de consulta customizada.
+	 *
+	 * Pageable pageable -> faz a paginação com os campos: size, page
+	 * @param lancamentofilter
+	 * @param pageable
+	 * @return
+	 */
 	@GetMapping
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and hasAuthority('SCOPE_read')")
 	public Page<Lancamento> pesquisar(LancamentoFilter lancamentofilter, Pageable pageable) {
 		
 		return lancamentoRepository.filtrar(lancamentofilter, pageable);
 	}
-	
-	
+
+	/**
+	 * Esse endPoint retorna uma projecao de Lancamento(Um resumo) para não precisar ser retornado o lancamento completo
+	 * @param lancamentoFilter
+	 * @param pageable
+	 * @return
+	 */
 	@GetMapping(params = "resumo") // se tiver um parametro chamado resumo na requisição esse sera o metodo chamado, senao sera o de cima
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and hasAuthority('SCOPE_read')")
 	public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
@@ -79,8 +93,10 @@ public class LancamentoResource {
 		Optional<Lancamento> lancamento = lancamentoRepository.findById(codigo);
 		return lancamento.isPresent() ? ResponseEntity.ok(lancamento.get()) : ResponseEntity.notFound().build();
 	}
-	
-	
+
+	/**
+	 * @Valid -> faz a validacao de todos os campos que possuem @NotNull dentro de Lancamento
+	 */
 	@PostMapping
 	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_LANCAMENTO') and hasAuthority('SCOPE_write')")
 	public ResponseEntity<Lancamento> criar(@Valid @RequestBody Lancamento lancamento, HttpServletResponse response) {
@@ -89,13 +105,14 @@ public class LancamentoResource {
 	    publisher.publishEvent(new RecursoCriadoEvent(this, response, lancamentoSalvo.getCodigo()));
 	    return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoSalvo);
 	}
-	
-	
-	@ExceptionHandler({PessoaInexistenteOuInativaException.class}) // Como essa excessão e uma exception especifica de lançamento, ela sera tratada diretamente aqui
+
+	// Como essa excessão e uma exception especifica de lançamento, ela sera tratada diretamente aqui
+	@ExceptionHandler({PessoaInexistenteOuInativaException.class})
 	public ResponseEntity<Object> handlePessoaInexistenteOuInativaException(PessoaInexistenteOuInativaException ex){
 		
 		String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null,
 				LocaleContextHolder.getLocale());
+
 		String mensagemDesenvolvedor = ex.toString();
 
 		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
@@ -108,6 +125,7 @@ public class LancamentoResource {
 	@PreAuthorize("hasAuthority('ROLE_REMOVER_LANCAMENTO') and hasAuthority('SCOPE_write')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long codigo) {
+
 	    lancamentoRepository.deleteById(codigo);
 	}
 	

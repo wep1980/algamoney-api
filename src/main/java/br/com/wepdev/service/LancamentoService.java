@@ -30,7 +30,6 @@ public class LancamentoService {
 		if (pessoa.isEmpty() || pessoa.get().isInativo()) {
 			throw new PessoaInexistenteOuInativaException();
 		}
-		
 		return lancamentoRepository.save(lancamento);
 	}
 	

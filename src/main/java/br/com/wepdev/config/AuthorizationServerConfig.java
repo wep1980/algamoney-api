@@ -29,7 +29,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	
     @Autowired
-	private AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager; // gerencia a autenticacao, pega o usuario e senha
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -43,25 +43,29 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+
+		// Ta configurado em memoria pq somente o angular q vai utilizar, mas poderia ser configurado em banco de dados para poder adicionar N clientes
 		clients.inMemory()
-				.withClient("angular")
-				.secret("$2a$10$UAc049fUm6Bxy8X/.mpn8.PfD2ncb4ZgvmEa5Hb.JOGVJNX1ampgG") // @ngul@r0 senha para acessar
-				.scopes("read", "write") // O que e permitido para o cliente angular, ler e escrever
-				.authorizedGrantTypes("password", "refresh_token") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
-				.accessTokenValiditySeconds(1800) // Tempo do token esta valido por 10 segundos, 30 min seria (1800)
-				.refreshTokenValiditySeconds(3600 * 24) // tempo de vida do refresh token, 1 dia
+					.withClient("angular")// nome do cliente
+					.secret("$2a$10$UAc049fUm6Bxy8X/.mpn8.PfD2ncb4ZgvmEa5Hb.JOGVJNX1ampgG") // @ngul@r0 senha para acessar
+					.scopes("read", "write") // O que e permitido para o cliente angular, ler e escrever
+					.authorizedGrantTypes("password", "refresh_token") // fluxo onde a aplicacao recebe usuario e senha para pegar o token
+					.accessTokenValiditySeconds(1800) // Tempo do token esta valido por 10 segundos, 30 min seria (1800)
+					.refreshTokenValiditySeconds(3600 * 24) // tempo de vida do refresh token, 1 dia
 				.and()
-				.withClient("mobile")
-				.secret(passwordEncoder.encode("m0b1le")) // Forma insegura
-				.scopes("read")
-				.authorizedGrantTypes("password", "refresh_token")
-				.accessTokenValiditySeconds(1800)
-				.refreshTokenValiditySeconds(3600 * 24);
+				     //Adicionando um novo cliente
+					.withClient("mobile")
+					.secret(passwordEncoder.encode("m0b1le")) // Forma insegura
+					.scopes("read")
+					.authorizedGrantTypes("password", "refresh_token")
+					.accessTokenValiditySeconds(1800)
+					.refreshTokenValiditySeconds(3600 * 24);
 	}
 	
 
 	/*
 	 * Metodo onde define onde o token e armazenado, o Angular acessa esse token
+	 * Nesse metodo o token pode ser trabalhado com mais detalhes
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
@@ -70,35 +74,36 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
 		
 		endpoints
-			.authenticationManager(authenticationManager) // verifica usuario e senha
+			.authenticationManager(authenticationManager) // valida usuario e senha
 			.userDetailsService(userDetailsService) // configura a parte de refresh do token
-			.tokenEnhancer(tokenEnhancerChain) // esse tpken contentando as informações do usuario que esta logado tb e passado
-			.accessTokenConverter(accessTokenConverter())
+			.tokenEnhancer(tokenEnhancerChain) // esse token contentando as informações do usuario que esta logado tb e passado
+			.accessTokenConverter(accessTokenConverter())  // converte o token
 			.tokenStore(tokenStore())
 			.reuseRefreshTokens(false); // sempre que for feito o pedido do um novo access token , um novo refresh token sera enviado
 	}
 	
 	/*
-	 * Metodo que contem a chave que valida o token
+	 * Metodo que contem a chave(senha) que valida o token
 	 */
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
 		JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
 
+		// senha que valida o token = 3032885ba9cd6621bcc4e7d6b6c35c2b
 		accessTokenConverter.setSigningKey("3032885ba9cd6621bcc4e7d6b6c35c2b");
 
 		return accessTokenConverter;
 	}
 
-
 	@Bean
 	public TokenStore tokenStore() {
+
 		return new JwtTokenStore(accessTokenConverter());
 	}
 
-	
 	@Bean
 	public TokenEnhancer tokenEnhancer() {
+
 		return new CustomTokenEnhancer();
 	}
 

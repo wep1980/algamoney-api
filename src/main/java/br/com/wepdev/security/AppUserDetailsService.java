@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 import br.com.wepdev.model.Usuario;
 import br.com.wepdev.repository.UsuarioRepository;
 
+/**
+ * Classe que contem a implementação da interface UserDetailsService
+ * Classe responsavel por buscar usuario no banco de dados
+ */
 @Service
 public class AppUserDetailsService implements UserDetailsService{
 
@@ -38,11 +42,12 @@ public class AppUserDetailsService implements UserDetailsService{
 	 */
 	private Collection<? extends GrantedAuthority> getPermissoes(Usuario usuario) {
 		
-		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+		Set<SimpleGrantedAuthority> autorizacoes = new HashSet<>();
+
+		// para cada permissao e adicionada dentro da lista de autorizacoes
+		usuario.getPermissoes().forEach(p -> autorizacoes.add(new SimpleGrantedAuthority(p.getDescricao().toUpperCase())));
 		
-		usuario.getPermissoes().forEach(p -> authorities.add(new SimpleGrantedAuthority(p.getDescricao().toUpperCase())));
-		
-		return authorities;
+		return autorizacoes;
 	}
 
 }

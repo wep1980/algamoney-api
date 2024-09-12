@@ -55,6 +55,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 	
     @Bean
     public JwtDecoder jwtDecoder() {
+
     	var secretKey = new SecretKeySpec("3032885ba9cd6621bcc4e7d6b6c35c2b".getBytes(), "HmacSHA256");
     	
     	return NimbusJwtDecoder.withSecretKey(secretKey).build();
@@ -65,8 +66,12 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     protected AuthenticationManager authenticationManager() throws Exception {        
         return super.authenticationManager();
     }
-    
 
+
+    /**
+     * Metodo para ler a senha encodada
+     * @return
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
     	 return new BCryptPasswordEncoder();
@@ -97,7 +102,6 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 	
 			return grantedAuthorities;
 		});
-	
 		return jwtAuthenticationConverter;
 	}
 

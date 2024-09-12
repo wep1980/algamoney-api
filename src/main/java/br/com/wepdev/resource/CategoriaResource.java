@@ -36,7 +36,9 @@ public class CategoriaResource {
 	 * @CrossOrigin(maxAge = 10, origins = { "http://localhost:8000" })
 	 * @return
 	 */
+	//@CrossOrigin(maxAge = 10, origins = { "http://localhost:8000" }) // Liberando o CORs somente para esse endpoint na origem http://localhost:8000
 	@GetMapping
+	// Somente usuarios com essa permissao pode acessar esse endPoint
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and hasAuthority('SCOPE_read')" )
 	public List<Categoria> listar() {
 		return categoriaRepository.findAll();

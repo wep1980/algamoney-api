@@ -12,13 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.wepdev.config.property.AlgamoneyApiProperty;
 
+/**
+ * Resource feito para implementacao da pagina de logout
+ */
 @RestController
 @RequestMapping("/tokens")
 public class TokenResource {
 	
 	
 	@Autowired
-	private AlgamoneyApiProperty algamoneyApiProperty;
+	private AlgamoneyApiProperty algamoneyApiProperty; // pegando a configuracao setada no properties
 
 	// Deleta o valor do refreshToken ao fazer logout
 	@DeleteMapping("/revoke")
@@ -26,7 +29,8 @@ public class TokenResource {
 		
 		Cookie cookie = new Cookie("refreshToken", null);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps()); 
+		// configuracao criada no properties para habilitar o https quando estiver em producão
+		cookie.setSecure(algamoneyApiProperty.getSeguranca().isEnableHttps());
 		cookie.setPath(req.getContextPath() + "/oauth/token");
 		cookie.setMaxAge(0); // expira agora
 		
