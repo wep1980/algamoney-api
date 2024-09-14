@@ -23,17 +23,17 @@ import br.com.wepdev.repository.UsuarioRepository;
 @Service
 public class AppUserDetailsService implements UserDetailsService{
 
-	
+
 	@Autowired
 	private UsuarioRepository usuarioRepository;
-	
-	
+
+
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		
+
 		Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(email);
 		Usuario usuario = usuarioOptional.orElseThrow(() -> new UsernameNotFoundException("Usuário e/ou senha incorretos"));
-		
+
 		return new UsuarioSistema(usuario, getPermissoes(usuario));
 	}
 
@@ -41,12 +41,12 @@ public class AppUserDetailsService implements UserDetailsService{
 	 * Metodo que pega as permissoes do usuario
 	 */
 	private Collection<? extends GrantedAuthority> getPermissoes(Usuario usuario) {
-		
+
 		Set<SimpleGrantedAuthority> autorizacoes = new HashSet<>();
 
 		// para cada permissao e adicionada dentro da lista de autorizacoes
 		usuario.getPermissoes().forEach(p -> autorizacoes.add(new SimpleGrantedAuthority(p.getDescricao().toUpperCase())));
-		
+
 		return autorizacoes;
 	}
 

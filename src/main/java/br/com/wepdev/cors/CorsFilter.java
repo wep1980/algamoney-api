@@ -28,26 +28,26 @@ public class CorsFilter implements Filter{
 
 	@Autowired
 	private AlgamoneyApiProperty algamoneyApiProperty;
-	
-	
+
+
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
 
 		HttpServletRequest request = (HttpServletRequest) req; // Fazendo cast
 		HttpServletResponse response = (HttpServletResponse) resp; // Fazendo cast
-		
+
 		// Essas 2 configuração estão de fora pq precisam ser sempre enviadas em todas as requisições
 		response.setHeader("Access-Control-Allow-Origin", algamoneyApiProperty.getOriginPermitida());
         response.setHeader("Access-Control-Allow-Credentials", "true"); // Configuração para o cookie que contem o refreshToken ser permitido
-		
+
         if ("OPTIONS".equals(request.getMethod()) && algamoneyApiProperty.getOriginPermitida().equals(request.getHeader("Origin"))) {
 			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
         	response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
 
 			// So depois de 1 hora que o browse vai fazer a proxima requisição, pq antes disso essa config fica armazenada em cache
         	response.setHeader("Access-Control-Max-Age", "3600");
-			
+
 			response.setStatus(HttpServletResponse.SC_OK);
 		} else {
 			chain.doFilter(req, resp);
