@@ -155,18 +155,18 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 			        A Classe metaModel Lancamento_ foi criada em target/generated-sources/annotations/....
 			        jpamodelgen -> dependencia adicionada no pom.xml
 			         */
-			        builder.lower(root.get(Lancamento_.descricao)), "%" + lancamentoFilter.getDescricao().toLowerCase() + "%"));
+			        builder.lower(root.get("descricao")), "%" + lancamentoFilter.getDescricao().toLowerCase() + "%"));
 		}
 
 		if (lancamentoFilter.getDataVencimentoDe() != null) {
 			predicates.add(
-					builder.greaterThanOrEqualTo(root.get(Lancamento_.dataVencimento), lancamentoFilter.getDataVencimentoDe()));
+					builder.greaterThanOrEqualTo(root.get("dataVencimento"), lancamentoFilter.getDataVencimentoDe()));
 			        //greaterThanOrEqualTo() -> MAIOR OU IGUAL dataVencimentoDe
 		}
 
 		if (lancamentoFilter.getDataVencimentoAte() != null) {
 			predicates.add(
-					builder.lessThanOrEqualTo(root.get(Lancamento_.dataVencimento), lancamentoFilter.getDataVencimentoAte()));
+					builder.lessThanOrEqualTo(root.get("dataVencimento"), lancamentoFilter.getDataVencimentoAte()));
 			        // lessThanOrEqualTo() -> MENOR OU IGUAL dataVencimentoAte
 		}
 		
